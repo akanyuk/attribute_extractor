@@ -3,7 +3,7 @@
 package main
 
 import (
-	"attribute_extractor/parser"
+	"github.com/akanyuk/attribute_extractor/parser"
 	"strings"
 
 	"bufio"

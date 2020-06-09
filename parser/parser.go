@@ -33,7 +33,10 @@ func Parse(reader io.Reader) ([][]string, error) {
 }
 
 func getAttribute(img image.Image, x int, y int) (int, error) {
-	firstFoundAttribute := Attribute{}
+	firstAttribute, err := rgbaToPixel(img.At(x, y).RGBA()).toAttribute()
+	if err != nil {
+		return 0, err
+	}
 
 	for y1 := y; y1 < y+8 && y1 < img.Bounds().Max.Y; y1++ {
 		for x1 := x; x1 < x+8 && x1 < img.Bounds().Max.X; x1++ {
@@ -42,24 +45,15 @@ func getAttribute(img image.Image, x int, y int) (int, error) {
 				return 0, err
 			}
 
-			if attr.Color == 0 {
+			if attr == firstAttribute {
 				continue
 			}
 
-			if firstFoundAttribute.Color == 0 {
-				firstFoundAttribute = attr
-				continue
-			}
-
-			if firstFoundAttribute == attr {
-				continue
-			}
-
-			return mixAttributes(firstFoundAttribute, attr), nil
+			return mixAttributes(firstAttribute, attr), nil
 		}
 	}
 
-	return mixAttributes(firstFoundAttribute, Attribute{}), nil
+	return mixAttributes(firstAttribute, Attribute{}), nil
 }
 
 func mixAttributes(ink Attribute, paper Attribute) int {
